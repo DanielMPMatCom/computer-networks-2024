@@ -1,0 +1,1 @@
+All python files must be executed from root directory
