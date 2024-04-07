@@ -245,9 +245,40 @@ class FTP:
             size = self.validate_150(response)
         return connection, size
 
-    # Retrieve file - Toledo
+    def retrieve_file(self, command, callback=None):
 
-    # Retrieve binary - Toledo
+        if callback is None:
+            callback = print
+
+        response = self.send_command("TYPE A", "void")
+
+        with self.create_subprocess(command)[0] as conn, conn.makefile(
+            "r", encoding=self.encoding
+        ) as fp:
+            
+            while True:
+                line = fp.readline(self.maxline + 1)
+                if len(line) > self.maxline:
+                    raise Error(f"Got more than {self.maxline} bytes")
+                if not line:
+                    break
+                if line[-2:] == CRLF:
+                    line = line[:-2]
+                elif line[-1:] == "\n":
+                    line = line[:-1]
+                callback(line)
+
+        return self.get_response(response_type="void")
+    
+    def retrieve_binary(self, command, callback, blocksize=8192, rest=None):
+
+        self.send_command("TYPE I", response_type="void")
+
+        with self.create_subprocess(command, rest)[0] as conn:
+            while data := conn.recv(blocksize):
+                callback(data)
+
+        return self.get_response(response_type="void")
 
     def send_file(self, command, file_object, callback=None):
         """command: Stor or Stou and file object with realines method"""
