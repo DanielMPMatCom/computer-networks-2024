@@ -60,6 +60,7 @@ class FTP:
     # Send command - Toledo
     def send_command(self, command: str, response_type: str = "get"):
         """
+        Send command to server and recieve response
         response_type = "get" or "void" or "multiline"
         """
 
@@ -71,6 +72,7 @@ class FTP:
     # Get response - Toledo
     def get_response(self, response_type: str = "get"):
         """
+        Recieve response from server
         response_type = "get" or "void" or "multiline"
         """
 
@@ -105,6 +107,10 @@ class FTP:
     # Active connection - Machado
 
     # Create subprocess - Toledo
+    def create_subprocess(self, command, rest=None):
+        """
+        Create New Connection for the transfer data
+        """
 
     # Retrieve file - Toledo
 
@@ -117,12 +123,34 @@ class FTP:
     # Read multiple lines - Osvaldo
 
     # ALLO - Toledo
+    def allo(self, size):
+        """
+        Allocate given size in server to store files
+        """
+
+        response = self.send_command("ALLO " + str(size))
+        
+        if self.debug:
+            print(f"Allocated {size} bytes in server")
+
+        return response
 
     # SITE - Osvaldo
 
     # SYST - Machado
 
     # STAT - Toledo
+    def stat(self):
+        """
+        Request server status
+        """
+
+        response = self.send_command("STAT")
+
+        if self.debug:
+            print(f"Server status requested with response: {response}")
+
+        return response
 
     # ABOR - Osvaldo
     
