@@ -342,7 +342,10 @@ class FTP:
         )
         return resp
 
-    # SYST - Machado
+    def syst(self):
+        """Solicitar información sobre el sistema operativo del servidor."""
+        resp = self.send_command("SYST")
+        return resp
 
     def stat(self):
         """
@@ -371,7 +374,10 @@ class FTP:
             raise error_not_expected(response)
         return response
 
-    # ACCT - Machado
+    def account(self, password):
+        """Send new account name."""
+        cmd = "ACCT " + password
+        return self.send_command(cmd, "void")
 
     def dir(self, pathname="", callback=None):  # list is a language word
         command = "LIST " + pathname
