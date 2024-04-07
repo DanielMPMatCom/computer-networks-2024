@@ -73,7 +73,6 @@ class FTP:
             raise error_reply(response)
         return response
 
-    # Send command - Toledo
     def send_command(self, command: str, response_type: str = "get"):
         """
         Send command to server and recieve response
@@ -85,7 +84,6 @@ class FTP:
             print(f"Sent: {command}")
         return self.get_response(response_type)
 
-    # Get response - Toledo
     def get_response(self, response_type: str = "get"):
         """
         Recieve response from server
@@ -214,7 +212,6 @@ class FTP:
 
     # Active connection - Machado
 
-    # Create subprocess - Toledo
     def create_subprocess(self, command, rest=None):
         """
         Create New Connection for the transfer data
@@ -230,7 +227,6 @@ class FTP:
 
     # Read multiple lines - Osvaldo
 
-    # ALLO - Toledo
     def allo(self, size):
         """
         Allocate given size in server to store files
@@ -247,7 +243,6 @@ class FTP:
 
     # SYST - Machado
 
-    # STAT - Toledo
     def stat(self):
         """
         Request server status
@@ -268,7 +263,6 @@ class FTP:
 
     # NLST - Machado
 
-    # CWD / CDUP - Toledo
     def cwd(self, directory_name):
         """
         Change working directory to given directory
@@ -286,7 +280,6 @@ class FTP:
         cmd = "CWD " + directory_name
         return self.send_command(cmd, response_type="void")
 
-    # SIZE - Toledo
     def size(self, filename):
         """
         Get file size in server
