@@ -107,8 +107,21 @@ class FTP:
         return response
 
     # Set passive server - Machado
+    def set_passive_server(self, val):
+        self.passive_server = val
 
     # Make passive server - Machado
+    def make_passive_server(self):
+        if self.af == socket.AF_INET:
+            parmas = self.send_command("PASV")
+            host, port = self.validate_227(parmas)
+            if not TRUST_IN_PASS_IPV4:
+                host = self.sock.getpeername()[0]
+        else:
+            host, port = self.validate_229(
+                self.send_command("EPSV"), self.sock.getpeername()
+            )
+        return host, port
 
     # Validations 150, 227, 229, 257 - Osvaldo
 
