@@ -49,9 +49,13 @@ class FTP:
             pass
 
 
-    # Connect - Machado
     def connect(self):
-        pass
+        self.sock = socket.create_connection(
+            (self.host, self.port), self.timeout, self.source_address
+        )
+        self.af = self.sock.family
+        # self.sock.connect((self.host, self.port))
+        return self.get_response()
 
     # Authenticate - Osvaldo
     def authenticate(self):
