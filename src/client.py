@@ -217,6 +217,23 @@ class FTP:
         Create New Connection for the transfer data
         """
 
+        if self.passive_server:
+            return self.passive_connection(command, rest)
+        else:
+            with self.makeport() as sock:
+                if rest is not None:
+                    self.send_command(f"REST {rest}")
+                response = self.send_command(command)
+                if response[0] == "2":
+                    response = self.get_response()
+                if response[0] != "1":
+                    raise error_reply(response)
+                connection, _ = sock.accept()
+                connection.timeout(self.timeout)
+        if response[:3] == "150":
+            size = self.validate_150(response)
+        return connection, size
+
     # Retrieve file - Toledo
 
     # Retrieve binary - Toledo
