@@ -106,11 +106,9 @@ class FTP:
 
         return response
 
-    # Set passive server - Machado
     def set_passive_server(self, val):
         self.passive_server = val
 
-    # Make passive server - Machado
     def make_passive_server(self):
         if self.af == socket.AF_INET:
             parmas = self.send_command("PASV")
@@ -175,9 +173,23 @@ class FTP:
                 directory_name += c
         return directory_name
 
-    # Sendport - Machado
+    def sendport(self, host, port):  # 318 sendport and sendeprt
+        if self.af == socket.AF_INET:
+            host = host.replace(".", ",")
+            port = f"{port >> 8},{port & 0xff}"
+            response = self.send_command(f"PORT {host},{port}")
+        else:
+            fields = ["", repr(2), host, repr(port), ""]
+            response = self.send_command("EPRT " + "|".join(fields))
 
-    # Makeport - Machado
+    def makeport(self):
+        # https://es.wikipedia.org/wiki/Protocolo_de_transferencia_de_archivos
+        """Create a new socket and send a PORT command for the data channel."""
+        sock = socket.create_server(("", 0), family=self.af, backlog=1)
+        port = sock.getsockname()[1]
+        host = self.sock.getsockname()[0]
+        self.sendport(host, port)
+        return sock
 
     def passive_connection(self, command, rest=None):
         host, port = self.make_passive_server()
