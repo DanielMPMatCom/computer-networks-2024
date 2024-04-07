@@ -1,4 +1,5 @@
 from socket import _GLOBAL_DEFAULT_TIMEOUT
+from message import *
 import socket
 import re
 import os
@@ -57,8 +58,37 @@ class FTP:
         pass
 
     # Send command - Toledo
+    def send_command(self, command: str, response_type: str = "get"):
+        """
+        response_type = "get" or "void" or "multiline"
+        """
+
+        self.sock.sendall(command.encode(self.encoding) + B_CRLF)
+        if self.debug:
+            print(f"Sent: {command}")
+        return self.get_response(response_type)
     
     # Get response - Toledo
+    def get_response(self, response_type: str = "get"):
+        """
+        response_type = "get" or "void" or "multiline"
+        """
+
+        self.file = self.sock.makefile("r", encoding="utf-8")
+        response = self.file.readline(MAXLINE)
+
+        if self.debug:
+            print(f"Recieved: {response}")
+
+        if response_type == "void":
+            if response[0] != "2":
+                raise error_reply(response)
+        
+        if response_type == "get":
+            if response[0] in ["4", "5", "6"]:
+                raise error_mapper(response[0])(response)
+            
+        return response
 
     # Set passive server - Machado
 
