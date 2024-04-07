@@ -255,7 +255,7 @@ class FTP:
         with self.create_subprocess(command)[0] as conn, conn.makefile(
             "r", encoding=self.encoding
         ) as fp:
-            
+
             while True:
                 line = fp.readline(self.maxline + 1)
                 if len(line) > self.maxline:
@@ -269,7 +269,7 @@ class FTP:
                 callback(line)
 
         return self.get_response(response_type="void")
-    
+
     def retrieve_binary(self, command, callback, blocksize=8192, rest=None):
 
         self.send_command("TYPE I", response_type="void")
@@ -428,7 +428,17 @@ class FTP:
 
     # STRU - Machado
 
-    # MODE - Osvaldo
+    def mode(self, set_mode="S"):
+        """Set file transfer mode
+        S : stream
+        B : block
+        C : comprimido
+        - `200`: El modo de transferencia de archivos se cambió correctamente.
+        - `500`: El comando `MODE` no fue reconocido o no se pudo ejecutar.
+        - `501`: Los parámetros del comando `MODE` no eran correctos.
+        """
+        response = self.send_command("MODE " + set_mode, "void")
+        return response
 
     # REIN - Toledo
 
