@@ -161,8 +161,33 @@ class FTP:
     # NLST - Machado
 
     # CWD / CDUP - Toledo
+    def cwd(self, directory_name):
+        """
+        Change working directory to given directory
+        """
+
+        if directory_name == "..":
+            try:
+                return self.send_command("CDUP", response_type="void")
+            except error_perm as msg:
+                raise 
+        
+        elif directory_name == "":
+            directory_name = "."
+        
+        cmd = "CWD " + directory_name
+        return self.send_command(cmd, response_type="void")
 
     # SIZE - Toledo
+    def size(self, filename):
+        """
+        Get file size in server
+        """
+
+        response = self.send_command("SIZE " + filename)
+
+        if response[:3] == "213":
+            return int(response[3:].strip())
 
     # SMNT - Osvaldo
 
