@@ -123,13 +123,80 @@ class FTP:
             )
         return host, port
 
-    # Validations 150, 227, 229, 257 - Osvaldo
+    def validate_150(self, response):
+        """150 Opening binary mode data connection for file transfer ({size} bytes)"""
+        if response[:3] != "150":
+            raise error_reply(response)
+        regular_expression_150 = re.compile(
+            r"150 .* \((\d+) bytes\)", re.IGNORECASE | re.ASCII
+        )
+        m = regular_expression_150.match(response)
+        return int(m.group(1)) if m else None
+
+    def validate_227(self, response):
+        """227 Entering Passive Mode (192,168,1,2,197,143)"""
+        if response[:3] != "227":
+            raise error_reply(response)
+        regular_expresion_227 = re.compile(
+            r"(\d+),(\d+),(\d+),(\d+),(\d+),(\d+)", re.ASCII
+        )
+        m = regular_expresion_227.search(response)
+        if not m:
+            raise error_not_expected()
+        n = m.groups()
+        host = ".".join(n[:4])
+        port = (int(n[4]) << 8) + int(n[5])
+        return host, port
+
+    def validate_229(self, response, peer):
+        """229 Entering Extended Passive Mode (|||6446|)"""
+        if response[:3] != "229":
+            raise error_reply(response)
+        host = peer[0]
+        port = int(response.split("|")[-2])  # (|||port|).
+        return host, port
+
+    def validate_257(self, response):
+        """257 "/home/usuario/directorio" is the current directory"""
+        if response[:3] != "257":
+            raise error_reply(response)
+        if response[3:5] != ' "':
+            return ""
+        directory_name = ""
+        i = 5
+        n = len(response)
+        while i < n:
+            c = response[i]
+            i += 1
+            if c == '"':
+                if i >= n or response[i] != '"':
+                    break
+                i += 1
+                directory_name += c
+        return directory_name
 
     # Sendport - Machado
 
     # Makeport - Machado
 
-    # Passive connection - Osvaldo
+    def passive_connection(self, command, rest=None):
+        host, port = self.make_passive_server()
+
+        connection = socket.create_connection(
+            (host, port), self.timeout, source_address=self.source_address
+        )
+        try:
+            if rest is not None:
+                self.send_command(f"REST {rest}")
+            response = self.send_command(command)
+            if response[0] == 2:
+                response = self.get_response()
+            if response[0] != "1":
+                raise error_reply(response)
+            return (connection, response)
+        except:
+            connection.close()
+            raise
 
     # Active connection - Machado
 
