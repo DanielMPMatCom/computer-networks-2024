@@ -304,7 +304,12 @@ class FTP:
 
         return response
 
-    # SITE - Osvaldo
+    def site(self, command):
+        """Enviar un comando al servidor distintos de los del protocolo. Se usa help primero"""
+        resp = self.send_command(
+            "SITE " + command,
+        )
+        return resp
 
     # SYST - Machado
 
@@ -337,7 +342,9 @@ class FTP:
 
     # ACCT - Machado
 
-    # LIST - Osvaldo
+    def dir(self, pathname="", callback=None):  # list is a language word
+        command = "LIST " + pathname
+        return self.retrieve_file(command, callback)
 
     # NLST - Machado
 
@@ -368,7 +375,19 @@ class FTP:
         if response[:3] == "213":
             return int(response[3:].strip())
 
-    # SMNT - Osvaldo
+    def smnt(self, directory_system):
+        """change filesystem
+        - `202`: El comando `SMNT` fue aceptado, pero la acción solicitada no se tomó porque el servidor no necesita cambiar el sistema de archivos.
+        - `250`: El comando `SMNT` fue aceptado y la acción solicitada se completó. El servidor ha cambiado al sistema de archivos especificado.
+        - `421`: El servicio no está disponible y la conexión se cerrará.
+        - `500`: El comando `SMNT` no fue reconocido o no se pudo ejecutar.
+        - `501`: Los parámetros del comando `SMNT` no eran correctos.
+        - `502`: El comando `SMNT` no ha sido implementado en el servidor.
+        - `530`: No estás autenticado, necesitas iniciar sesión.
+        - `550`: El sistema de archivos especificado no existe o no está disponible.
+        """
+        response = self.send_command("SMNT " + directory_system, "void")
+        return response
 
     # STRU - Machado
 
