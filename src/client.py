@@ -210,7 +210,18 @@ class FTP:
             connection.close()
             raise
 
-    # Active connection - Machado
+    def active_connection(self, command, rest=None):
+        with self.makeport() as sock:
+            if rest is not None:
+                self.send_command(f"REST {rest}")
+            response = self.send_command(command)
+            if response[0] == 2:
+                response = self.get_response()
+            if response[0] != "1":
+                raise error_reply(response)
+            connection, _ = sock.accept()
+            connection.timeout(self.timeout)
+        return connection
 
     def create_subprocess(self, command, rest=None):
         """
