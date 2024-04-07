@@ -249,11 +249,48 @@ class FTP:
 
     # Retrieve binary - Toledo
 
-    # Send file - Osvaldo
+    def send_file(self, command, file_object, callback=None):
+        """command: Stor or Stou and file object with realines method"""
+        self.send_command("TYPE A", "void")
+        with self.create_subprocess(command)[0] as conn:
+            while True:
+                buffer = file_object.readlines(self.maxline + 1)
+                if not buffer:
+                    break
+                if buffer[-2:] != B_CRLF:
+                    if buffer[-1] in B_CRLF:
+                        buffer = buffer[:-1]
+                    conn.sendall(b"".join(buffer))
+                    if callback:
+                        callback(b"".join(buffer))
+        return self.get_response("void")
 
-    # Send binary - Osvaldo
+    def send_binary(
+        self, command, file_object, blocksize=8192, callback=None, rest=None
+    ):
+        """command: Stor or Stou and file object with realines method"""
+        self.send_command("TYPE I", "void")
+        with self.create_subprocess(command, rest)[0] as conn:
+            while True:
+                buf = file_object.read(blocksize)
+                if not buf:
+                    break
+                conn.sendall(buf)
+                if callback:
+                    callback(buf)
+        return self.get_response("void")
 
-    # Read multiple lines - Osvaldo
+    def read_multilines(self, first_line=""):
+        """use in case to read a multiline response and return it as a string"""
+        lines = first_line if first_line != "" else self.file.readline()
+        if lines[3] == "-":
+            code = lines[:3]
+            while True:
+                next_line = self.file.readline()
+                lines += "\n" + next_line
+                if next_line[:3] == code and next_line[3:4] != "-":
+                    break
+        return lines
 
     def allo(self, size):
         """
@@ -261,7 +298,7 @@ class FTP:
         """
 
         response = self.send_command("ALLO " + str(size))
-        
+
         if self.debug:
             print(f"Allocated {size} bytes in server")
 
@@ -283,7 +320,20 @@ class FTP:
 
         return response
 
-    # ABOR - Osvaldo
+    def abort(self):
+        """Abort transfer, out of band
+        Responses:
+        225: La solicitud de aborto fue exitosa, y la conexión de datos se ha cerrado.
+        226: La solicitud de aborto fue exitosa, y la transferencia de archivos se ha completado.
+        426: La conexión se cerró; la transferencia de archivos no se completó.
+        500: El comando ABOR no fue reconocido o no se pudo ejecutar.
+        """
+        command = b"ABOR" + B_CRLF
+        response = self.sock.sendall(command, MSG_OOB)
+        response = self.read_multilines()
+        if response[:3] not in ["225", "226", "426", "500"]:
+            raise error_not_expected(response)
+        return response
 
     # ACCT - Machado
 
@@ -300,11 +350,11 @@ class FTP:
             try:
                 return self.send_command("CDUP", response_type="void")
             except error_perm as msg:
-                raise 
-        
+                raise
+
         elif directory_name == "":
             directory_name = "."
-        
+
         cmd = "CWD " + directory_name
         return self.send_command(cmd, response_type="void")
 
