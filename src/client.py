@@ -485,7 +485,12 @@ class FTP:
 
     # PWD - Osvaldo
 
-    # QUIT - Toledo
+    def quit_and_close_connection(self):
+        response = self.send_command("QUIT", response_type="void")
+        self.close_connection()
+        
+        return response
+
 
     def close_connection(self):
         try:
@@ -512,6 +517,15 @@ class FTP:
 
     # APPE - Osvaldo
 
-    # HELP - Toledo
+    def help(self, cmd=None):
+        if cmd is not None:
+            return self.send_command("HELP " + cmd, response_type="void")
+        response = self.send_command("HELP", response_type="void")
+        response = self.read_multilines(response)
+        
+        if self.debug:
+            print(response)
+
+        return response
 
     # NOOP - Machado
