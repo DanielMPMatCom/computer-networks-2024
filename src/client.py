@@ -18,7 +18,7 @@ class FTP:
         host="",
         port=21,
         username="anonymous",
-        password="anonymous",
+        password="anonymous@",
         acct="",
         timeout=_GLOBAL_DEFAULT_TIMEOUT,
         source_address=None,
@@ -47,7 +47,12 @@ class FTP:
 
         # Connect to host and authenticate
         if host:
-            pass
+            # print("Available Host")
+            response = self.connect()
+            # print("Connected to Host")
+            print(response)
+            if username:
+                self.authenticate()
 
     def connect(self):
         self.sock = socket.create_connection(
@@ -472,10 +477,10 @@ class FTP:
     def delete(self, filename):
 
         response = self.send_command("DELE " + filename)
-        
+
         if response[:3] not in ["200", "250"]:
             raise error_reply(response)
-        
+
         return response
 
     def mkd(self, directory_name):
@@ -497,9 +502,8 @@ class FTP:
     def quit_and_close_connection(self):
         response = self.send_command("QUIT", response_type="void")
         self.close_connection()
-        
-        return response
 
+        return response
 
     def close_connection(self):
         try:
@@ -534,8 +538,8 @@ class FTP:
         if type == "A":
             self.send_file("STOR " + name, fp, callback)
         else:
-            self.send_binary("STOR" + name, fp, callback)
-    
+            self.send_binary("STOR " + name, fp, callback)
+
     def stou(self, pathname, callback=None, type="A"):
         fp = open(pathname, "rb+")
         if type == "A":
@@ -551,22 +555,21 @@ class FTP:
             self.send_binary("APPE " + name, fp, callback)
 
     def retr(self, name, pathname, type="A"):
-            new_file = open(pathname, "w+")
-            callback = lambda data: new_file.write(data + "\n")
+        new_file = open(pathname, "w+")
+        callback = lambda data: new_file.write(data + "\n")
 
-            if type == "A":
-                self.retrieve_file("RETR " + name, callback)
-            else:
-                self.retrieve_binary("RETR " + name, callback)
-            new_file.close()
-
+        if type == "A":
+            self.retrieve_file("RETR " + name, callback)
+        else:
+            self.retrieve_binary("RETR " + name, callback)
+        new_file.close()
 
     def help(self, cmd=None):
         if cmd is not None:
             return self.send_command("HELP " + cmd, response_type="void")
         response = self.send_command("HELP", response_type="void")
         response = self.read_multilines(response)
-        
+
         if self.debug:
             print(response)
 
