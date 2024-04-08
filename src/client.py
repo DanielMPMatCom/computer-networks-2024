@@ -464,12 +464,21 @@ class FTP:
 
     # DELE - Toledo
 
-    # MKD - Osvaldo
+    def mkd(self, directory_name):
+        resp = self.send_command("MKD " + directory_name, "void")
+        if resp[:3] != "257":
+            return ""
+        return self.validate_257(resp)
 
     def rmd(self, directory_name):
         return self.send_command("RMD " + directory_name, "void")
 
-    # PWD - Osvaldo
+    def pwd(self):
+        """Current Work Dir"""
+        response = self.send_command("PWD", "void")
+        if not response[:3] != "257":
+            return ""
+        return self.validate_257(response)
 
     # QUIT - Toledo
 
@@ -485,7 +494,21 @@ class FTP:
             if sock is not None:
                 sock.close()
 
-    # MLSD - Osvaldo
+    def mlsd(self, path="", facts=[]):
+        if facts:
+            self.send_command("OPTS MLST " + ";".join(facts) + ";")
+
+        cmd = "MLSD " + path
+        lines = []
+
+        self.retrieve_file(cmd, lines.append)
+        for line in lines:
+            facts_found, _, name = line.rstrip(CRLF).partition(" ")
+            entry = {}
+            for fact in facts_found[:-1].split(";"):
+                key, _, value = fact.partition("=")
+                entry[key.lower()] = value
+            yield (name, entry)
 
     # STOR - Toledo
 
@@ -496,7 +519,12 @@ class FTP:
         else:
             self.send_binary("STOU", fp, callback)
 
-    # APPE - Osvaldo
+    def appe(self, name, pathname, callback=None, type="A"):
+        fp = open(pathname, "rb+")
+        if type == "A":
+            self.send_file("APPE " + name, fp, callback)
+        else:
+            self.send_binary("APPE " + name, fp, callback)
 
     # HELP - Toledo
 
