@@ -469,7 +469,14 @@ class FTP:
             raise error_reply(resp)
         return self.send_command("RNTO " + new_name, response_type="void")
 
-    # DELE - Toledo
+    def delete(self, filename):
+
+        response = self.send_command("DELE " + filename)
+        
+        if response[:3] not in ["200", "250"]:
+            raise error_reply(response)
+        
+        return response
 
     # MKD - Osvaldo
 
