@@ -383,7 +383,10 @@ class FTP:
         command = "LIST " + pathname
         return self.retrieve_file(command, callback)
 
-    # NLST - Machado
+    def nlst(self, pathname="", callback=None):
+        command = "NLST " + pathname
+        response = self.retrieve_file(command, callback=callback)
+        return response
 
     def cwd(self, directory_name):
         """
@@ -426,7 +429,17 @@ class FTP:
         response = self.send_command("SMNT " + directory_system, "void")
         return response
 
-    # STRU - Machado
+    def stru(self, set_estructure="F"):
+        """Set file transfer structure
+        F : flujo
+        R : registro
+        P : paginas
+        - `200`: La estructura de transferencia de archivos se cambió correctamente.
+        - `500`: El comando `STRU` no fue reconocido o no se pudo ejecutar.
+        - `501`: Los parámetros del comando `STRU` no eran correctos.
+        """
+        response = self.send_command("STRU " + set_estructure, "void")
+        return response
 
     def mode(self, set_mode="S"):
         """Set file transfer mode
