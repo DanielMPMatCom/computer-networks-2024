@@ -236,16 +236,14 @@ class FTPServer:
         )
 
     def mlsd(self, connection, command):
-        path = self.cwd if len(command.split()) < 2 else command.split()[1]
-        print(" = = == = " + path)
-        dir_list = (
-            "\n".join(os.listdir(os.path.realpath(os.path.join(self.cwd, path))))
-            + B_CRLF
-        )
+        path = "" if len(command.split()) < 2 else command.split()[1]
+        directory_path = os.path.realpath(os.path.join(self.cwd, path))
+        dir_list = os.listdir(directory_path)
         self.send_response(connection, "150 Here comes the directory listing.")
         data_conn, _ = self.data_socket.accept()
-        for name in os.listdir(dir_list):
-            full_path = os.path.join(path, name)
+
+        for name in dir_list:
+            full_path = os.path.join(directory_path, name)
             stats = os.stat(full_path)
             facts = {
                 "type": "dir" if os.path.isdir(full_path) else "file",
