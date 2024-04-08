@@ -501,7 +501,12 @@ class FTP:
 
     # MLSD - Osvaldo
 
-    # STOR - Toledo
+    def stor(self, name, path_name, callback=None, type="A"):
+        fp = open(path_name, "rb+")
+        if type == "A":
+            self.send_file("STOR " + name, fp, callback)
+        else:
+            self.send_binary("STOR" + name, fp, callback)
 
     # STOU - Machado
 
