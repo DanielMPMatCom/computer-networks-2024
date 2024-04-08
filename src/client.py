@@ -453,7 +453,14 @@ class FTP:
         response = self.send_command("MODE " + set_mode, "void")
         return response
 
-    # REIN - Toledo
+    def rein(self):
+
+        response = self.send_command("REIN", response_type="void")
+
+        if self.debug:
+            print(f"Response of REIN is {response}")
+
+        return response
 
     def rename(self, previous_name, new_name):
 
