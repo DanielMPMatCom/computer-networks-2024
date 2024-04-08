@@ -1,8 +1,9 @@
 from client import FTP
 
-if __name__ == 'main':
+if __name__ == '__main__':
 
-    print("Console App Started\N")
+    print("Console App Started\n")
+
     username = input("username: ") 
     password = input("password: ")
     host = input("host: ")
@@ -11,9 +12,9 @@ if __name__ == 'main':
     username = username if username != "" else "anonymous"
     password = password if password != "" else "anonymous@"
     host = host if host != "" else "localhost"
-    port = port if port != "" else "port"
+    port = port if port != "" else "21"
 
-    debug_mode = input("Would you like to enter debug mode Y/N")
+    debug_mode = input("Would you like to enter debug mode Y/N \n")
     debug = True if debug_mode in ["Y", "y", "S", "s", "Yes", "yes"] else False
 
     ftp = FTP(host, int(port), username, password, debug)
@@ -25,38 +26,37 @@ if __name__ == 'main':
         if command[0] == "SHOW":
             print(
                 """
-                ALLO <size> : Reserva size bytes de espacio en el servidor para un archivo
-                SITE <cmd>  : Enviar un comando al servidor distintos de los del protocolo. Se usa help primero
-                SYST        : Solicitar información sobre el sistema operativo del servidor
-                STAT        : Solicitar el estado del servidor
-                ABOR        : Abortar una transferencia
-                ACCT        : Enviar un nuevo nombre de cuenta
-                LIST <path> : Mostrar los archivos y directorios en el directorio actual o en el directorio especificado
-                MKD  <name> : Crear un directorio en el servidor
-                NLST <path> : Devolver una lista de nombres de archivos en el directorio actual (por defecto) o en el directorio especificado 
-                CWD  <dir>  : Cambiar el directorio de trabajo actual, en caso de recibir .. se mueve al anterior
-                SIZE <name> : Obtener el tamaño de un archivo en el servidor
-                SMNT <dir>  : Cambiar el sistema de archivos del servidor
-                STRU <opt>  : Seleccionar la estructura de transferencia de archivos F : flujo, R : registro, P : paginas
-                MODE <opt>  : Seleccionar el modo de transferencia de archivos S : stream, B : block, C : comprimido
-                REIN        : Reiniciar la conexión de control
-                RENM <previous> <new>       : Renombra un archivo en el servidor
-                DELE <name> : Eliminar un archivo en el servidor
-                MKD  <dir>  : Crear un directorio en el servidor
-                RMD  <dir>  : Eliminar un directorio en el servidor
-                PWD         : Obtener el directorio de trabajo actual
-                QUIT        : Cerrar la conexión con el servidor
-                CLOSE       : Cerrar la el archivo actual y el socket con el servidor
-                MLSD <path> <facts>         : Listar un directorio en formato de lista de nombres de archivos
-                STOR <name> <path> <type>   : Almacenar un archivo en el servidor
-                STOU <path> <type>          : Almacenar un archivo en el servidor con un nombre único
-                APPE <name> <path> <type>   : Agregar datos a un archivo en el servidor
-                RETR <name> <path> <type>   : Recuperar un archivo del servidor
-                HELP <cmd>  : Solicitar ayuda sobre los comandos del servidor
-                NOOP        : Envia una instrucción al servidor para mantener la conexión abierta
+    ALLO <size> : Reserva size bytes de espacio en el servidor para un archivo
+    SITE <cmd>  : Enviar un comando al servidor distintos de los del protocolo. Se usa help primero
+    SYST        : Solicitar información sobre el sistema operativo del servidor
+    STAT        : Solicitar el estado del servidor
+    ABOR        : Abortar una transferencia
+    ACCT        : Enviar un nuevo nombre de cuenta
+    LIST <path> : Mostrar los archivos y directorios en el directorio actual o en el directorio especificado
+    MKD  <name> : Crear un directorio en el servidor
+    NLST <path> : Devolver una lista de nombres de archivos en el directorio actual (por defecto) o en el directorio especificado 
+    CWD  <dir>  : Cambiar el directorio de trabajo actual, en caso de recibir .. se mueve al anterior
+    SIZE <name> : Obtener el tamaño de un archivo en el servidor
+    SMNT <dir>  : Cambiar el sistema de archivos del servidor
+    STRU <opt>  : Seleccionar la estructura de transferencia de archivos F : flujo, R : registro, P : paginas
+    MODE <opt>  : Seleccionar el modo de transferencia de archivos S : stream, B : block, C : comprimido
+    REIN        : Reiniciar la conexión de control
+    RENM <previous> <new>       : Renombra un archivo en el servidor
+    DELE <name> : Eliminar un archivo en el servidor
+    MKD  <dir>  : Crear un directorio en el servidor
+    RMD  <dir>  : Eliminar un directorio en el servidor
+    PWD         : Obtener el directorio de trabajo actual
+    QUIT        : Cerrar la conexión con el servidor
+    CLOSE       : Cerrar la el archivo actual y el socket con el servidor
+    MLSD <path> <facts>         : Listar un directorio en formato de lista de nombres de archivos
+    STOR <name> <path> <type>   : Almacenar un archivo en el servidor
+    STOU <path> <type>          : Almacenar un archivo en el servidor con un nombre único
+    APPE <name> <path> <type>   : Agregar datos a un archivo en el servidor
+    RETR <name> <path> <type>   : Recuperar un archivo del servidor
+    HELP <cmd>  : Solicitar ayuda sobre los comandos del servidor
+    NOOP        : Envia una instrucción al servidor para mantener la conexión abierta
                 """
             )
-            continue
 
         match command[0]:
             case "ALLO":
@@ -126,6 +126,7 @@ if __name__ == 'main':
             case "QUIT":
                 if len(command) == 1:
                     ftp.quit_and_close_connection()
+                    break
             case "CLOSE":
                 if len(command) == 1:
                     ftp.close_connection()
