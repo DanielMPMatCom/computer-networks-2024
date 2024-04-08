@@ -393,7 +393,7 @@ class FTP:
         response = self.retrieve_file(command, callback=callback)
         return response
 
-    def cwd(self, directory_name):
+    def cwd(self, directory_name=""):
         """
         Change working directory to given directory
         """
@@ -555,6 +555,8 @@ class FTP:
             self.send_binary("APPE " + name, fp, callback)
 
     def retr(self, name, pathname, type="A"):
+        if os.path.isdir(pathname):
+            pathname = os.path.join(pathname, name)
         new_file = open(pathname, "w+")
         callback = lambda data: new_file.write(data + "\n")
 

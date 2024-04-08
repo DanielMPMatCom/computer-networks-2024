@@ -21,14 +21,14 @@ class FTPServer:
         self,
         host="localhost",
         port=21,
-        file_system=["./src/server/mainStorage/"],
+        file_system=["./src/server/mainStorage/", "./src/server/mainStorage2/"],
         current_file_system_index=1,
         max_connections=5,
         timeout=_GLOBAL_DEFAULT_TIMEOUT,
         encoding="utf-8",
         debug=False,
         passive_server=True,
-        welcome_message="Welcome. FTP Server 2024 v1.2",
+        welcome_message="Welcome, FTP Server 2024 v1.4. Made with ❤️ in Python",
     ):
         self.host = host
         self.port = port
@@ -162,15 +162,7 @@ class FTPServer:
                     self.site(connection, data)
                 elif command == "SMNT":
                     self.smnt(connection, data)
-                # elif command == "AUTH":
-                #     self.auth(connection, addresss, command)
-                # elif command == "PBSZ":
-                #     self.pbsz(connection, addresss, command)
-                # elif command == "PROT":
-                #     self.prot(connection, addresss, command)
-                # elif command == "FEAT":
-                #     self.features(connection, addresss, command)
-                elif command == "MlSD":
+                elif command == "MLSD":
                     self.mlsd(connection, data)
                 elif command == "EPSV":
                     self.extended_passive_mode(connection)
@@ -245,7 +237,11 @@ class FTPServer:
 
     def mlsd(self, connection, command):
         path = self.cwd if len(command.split()) < 2 else command.split()[1]
-        dir_list = "\n".join(os.listdir(os.path.join(self.cwd, path))) + "\r\n"
+        print(" = = == = " + path)
+        dir_list = (
+            "\n".join(os.listdir(os.path.realpath(os.path.join(self.cwd, path))))
+            + B_CRLF
+        )
         self.send_response(connection, "150 Here comes the directory listing.")
         data_conn, _ = self.data_socket.accept()
         for name in os.listdir(dir_list):
@@ -524,7 +520,7 @@ class FTPServer:
             )
 
     def site(self, connection, command):
-        if command[4:].strip() == "LFS":
+        if command[4:].strip().upper() == "LFS":
             self.LFS(connection)
         else:
             self.send_response(
