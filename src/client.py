@@ -455,19 +455,35 @@ class FTP:
 
     # REIN - Toledo
 
-    # RNFR / RNTO - Machado
+    def rename(self, previous_name, new_name):
+
+        resp = self.send_command("RNFR " + previous_name)
+        if resp[0] != "3":
+            raise error_reply(resp)
+        return self.send_command("RNTO " + new_name, response_type="void")
 
     # DELE - Toledo
 
     # MKD - Osvaldo
 
-    # RMD - Machado
+    def rmd(self, directory_name):
+        return self.send_command("RMD " + directory_name, "void")
 
     # PWD - Osvaldo
 
     # QUIT - Toledo
 
-    # CLOSE - Machado
+    def close_connection(self):
+        try:
+            file = self.file
+            self.file = None
+            if file is not None:
+                file.close()
+        finally:
+            sock = self.sock
+            self.sock = None
+            if sock is not None:
+                sock.close()
 
     # MLSD - Osvaldo
 
