@@ -418,7 +418,7 @@ class FTP:
         response = self.send_command("SIZE " + filename)
 
         if response[:3] == "213":
-            return int(response[3:].strip())
+            return response[3:].strip()
 
     def smnt(self, directory_system):
         """change filesystem
