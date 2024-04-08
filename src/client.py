@@ -535,7 +535,7 @@ class FTP:
             self.send_file("STOR " + name, fp, callback)
         else:
             self.send_binary("STOR" + name, fp, callback)
-
+    
     def stou(self, pathname, callback=None, type="A"):
         fp = open(pathname, "rb+")
         if type == "A":
@@ -549,6 +549,17 @@ class FTP:
             self.send_file("APPE " + name, fp, callback)
         else:
             self.send_binary("APPE " + name, fp, callback)
+
+    def retr(self, name, pathname, type="A"):
+            new_file = open(pathname, "w+")
+            callback = lambda data: new_file.write(data + "\n")
+
+            if type == "A":
+                self.retrieve_file("RETR " + name, callback)
+            else:
+                self.retrieve_binary("RETR " + name, callback)
+            new_file.close()
+
 
     def help(self, cmd=None):
         if cmd is not None:
