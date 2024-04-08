@@ -489,10 +489,16 @@ class FTP:
 
     # STOR - Toledo
 
-    # STOU - Machado
+    def stou(self, pathname, callback=None, type="A"):
+        fp = open(pathname, "rb+")
+        if type == "A":
+            self.send_file("STOU", fp, callback)
+        else:
+            self.send_binary("STOU", fp, callback)
 
     # APPE - Osvaldo
 
     # HELP - Toledo
 
-    # NOOP - Machado
+    def noop(self):
+        return self.send_command("NOOP", response_type="void")
