@@ -1,5 +1,7 @@
 # Redes de computadoras 2024
 
+![Imagen](images/image.jpeg)
+
 El objetivo del proyecto es desarrollar una implemetación desde cero de un cliente de un protocolo de la capa de aplicación del modelo TCP/IP. 
 
 Dicha implementacion debe estar completamente reflejada en github. Para ello cada equipo debe:
@@ -29,3 +31,6 @@ Protocolos a implementar:
 2. FTP
 3. HTTP
 4. IRC
+
+
+![Image2](images/image2.jpeg)
